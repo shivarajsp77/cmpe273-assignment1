@@ -1,4 +1,4 @@
-package edu.sjsu.cmpe.library.api.resources;
+package edu.sjsu.cmpe.library.repository;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -26,9 +26,15 @@ import edu.sjsu.cmpe.library.repository.BookRepositoryInterface;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class BookResource {
-    
+    /** bookRepository instance */
     private final BookRepositoryInterface bookRepository;
 
+    /**
+     * BookResource constructor
+     * 
+     * @param bookRepository
+     *            a BookRepository instance
+     */
     public BookResource(BookRepositoryInterface bookRepository) {
 	this.bookRepository = bookRepository;
     }
@@ -41,19 +47,20 @@ public class BookResource {
 	Book book = bookRepository.getBookByISBN(isbn.get());
 	BookDto bookResponse = new BookDto(book);
 	
-	bookResponse.addLink(new LinkDto("view-book", "/books/" + book.getIsbn(),"GET"));
-	bookResponse.addLink(new LinkDto("update-book","/books/" + book.getIsbn(), "PUT"));
-	bookResponse.addLink(new LinkDto("delete-book", "/books/" + book.getIsbn(),"DELETE"));
-	bookResponse.addLink(new LinkDto("create-review", "/books/" + book.getIsbn() + "reviews","POST"));
-	bookResponse.addLink(new LinkDto("view-all-reviews", "/books/" + book.getIsbn() + "reviews","GET"));
-	
+	bookResponse.addLink(new LinkDto("view-book", "/books/" + book.getIsbn(),
+		"GET"));
+	bookResponse.addLink(new LinkDto("update-book",
+		"/books/" + book.getIsbn(), "PUT"));
+	bookResponse.addLink(new LinkDto("delete-book", "/books/" + book.getIsbn(),
+			"GET"));
+	// add more links
 	return bookResponse;
     }
 
     @POST
     @Timed(name = "create-book")
     public Response createBook(Book request) {
-	
+	// Store the new book in the BookRepository so that we can retrieve it.
 	 
     	Book savedBook = bookRepository.saveBook(request);
 	
@@ -63,10 +70,10 @@ public class BookResource {
 	
 	LinksDto bookResponse = new LinksDto();
 	bookResponse.addLink(new LinkDto("view-book", location, "GET"));
-	bookResponse.addLink(new LinkDto("update-book", location, "PUT"));
+	bookResponse.addLink(new LinkDto("update-book", location, "POST"));
 	bookResponse.addLink(new LinkDto("delete-book", location, "DELETE"));
 	bookResponse.addLink(new LinkDto("create-review", location1, "POST"));
-	
+	// Add other links if needed
 
 	return Response.status(201).entity(bookResponse).build();
     }
@@ -82,14 +89,15 @@ public class BookResource {
     	
         if(reply==true){
     	
+//    	Book savedBook = bookRepository.saveBook();
+    	//BookDto bookResponse = new BookDto(book);
     	LinksDto bookResponse = new LinksDto();
     	bookResponse.addLink(new LinkDto("Create-book", location, "POST"));
     	  	
     return Response.status(200).entity(bookResponse).build();}
-        
         else
         
-    return Response.status(406).build();
+        	return Response.status(406).build();
         	
           }
     
@@ -103,10 +111,12 @@ public class BookResource {
     	
     	Boolean reply = bookRepository.updateBookByISBN(isbn.get(),status);
     	
-    	String location = "/books/" + book.getIsbn();
+    	String location = "/books";// + book.getuIsbn();
     	String location1= "/books/" + book.getIsbn() + "/reviews";
         if(reply==true){
     	
+//    	Book savedBook = bookRepository.saveBook();
+    	//BookDto bookResponse = new BookDto(book);s
     	LinksDto bookResponse = new LinksDto();
     	bookResponse.addLink(new LinkDto("view-book", location, "GET"));
     	bookResponse.addLink(new LinkDto("update-book", location, "PUT"));
@@ -115,14 +125,11 @@ public class BookResource {
     	bookResponse.addLink(new LinkDto("view-all-reviews", location1, "GET"));
     	
     return Response.status(200).entity(bookResponse).build();}
-        
         else
         
-    return Response.status(406).build();
+        	return Response.status(406).build();
     
   }
     
 }
     
-
-
